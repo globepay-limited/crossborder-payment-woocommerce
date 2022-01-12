@@ -188,12 +188,13 @@ class GlobePay_API{
         curl_setopt($ch, CURLOPT_INFILE, $temp);
         curl_setopt($ch, CURLOPT_INFILESIZE, strlen($data));
         curl_setopt($ch, CURLOPT_TIMEOUT, 120);
-        $response = wp_remote_get();
+//        $response = wp_remote_get();
+        $response = curl_exec($ch);
         $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error=curl_error($ch);
         curl_close($ch);
         if($httpStatusCode!=200){
-            throw new Exception("invalid httpstatus:{$httpStatusCode} ,response:$response,detail_error:".$error,$httpStatusCode);
+            throw new Exception("invalid httpstatus:{$httpStatusCode} ,response:{$response['body']},detail_error:".$error,$httpStatusCode);
         }
 
         $result =$response;
@@ -250,15 +251,43 @@ class GlobePay_API{
                 'Authorization' => 'Basic ' . base64_encode( YOUR_USERNAME . ':' . YOUR_PASSWORD )
             )
         );
-		$result = $response = wp_remote_post($url,$args);
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_PUT, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $head_arr);
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt( $ch, CURLOPT_CAINFO, ABSPATH . WPINC . '/certificates/ca-bundle.crt');
+
+        $temp = tmpfile();
+        fwrite($temp, $data);
+        fseek($temp, 0);
+
+        curl_setopt($ch, CURLOPT_INFILE, $temp);
+        curl_setopt($ch, CURLOPT_INFILESIZE, strlen($data));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+        $response = curl_exec($ch);
+        $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error=curl_error($ch);
+        curl_close($ch);
+        if($httpStatusCode!=200){
+            throw new Exception("invalid httpstatus:{$httpStatusCode} ,response:{$response['body']},detail_error:".$error,$httpStatusCode);
+        }
+
+        $result =$response;
         $resArr = json_decode($result,false);
+//		$result = $response = wp_remote_put($url,$args);
+//        $resArr = json_decode($result['body'],false);
         if(!$resArr){
             return new WP_Error( 'refuse_error', $result);
         }
         return $resArr;
     }
 
-    public function query_order_status($globepay_order_id){
+    public static function query_order_status($globepay_order_id){
 
 
 		$partner_code = self::get_partner_code();
@@ -276,7 +305,7 @@ class GlobePay_API{
 		$url ="https://pay.globepay.co/api/v1.0/gateway/partners/$partner_code/orders/$globepay_order_id";
 		$url.="?time=$time&nonce_str=$nonce_str&sign=$sign";
         $result = wp_remote_get( $url);
-		$resArr = json_decode($result,false);
+		$resArr = json_decode($result['body'],false);
 
 		if(!$resArr){
 			return new WP_Error( 'refuse_error', $result);
@@ -303,7 +332,7 @@ class GlobePay_API{
 		$url ="https://pay.globepay.co/api/v1.0/gateway/partners/$partner_code/orders/$globepay_order_id/refunds/$globepay_refund_id";
 		$url.="?time=$time&nonce_str=$nonce_str&sign=$sign";
 		$result = wp_remote_get( $url);
-		$resArr = json_decode($result,false);
+		$resArr = json_decode($result['body'],false);
 		if(!$resArr){
 			return new WP_Error( 'refuse_error', $result);
 		}
@@ -313,7 +342,7 @@ class GlobePay_API{
     }
 
     public static function get_order_title($order,$limit=32,$trimmarker='...'){
-	    $title ="";
+	    $title = '#'.$order->get_id()." ";
 		$order_items = $order->get_items();
 		if($order_items){
 		    $qty = count($order_items);
@@ -330,8 +359,7 @@ class GlobePay_API{
 		return apply_filters('payment-get-order-title', $title,$order);
 	}
 
-	public function wc_globepay_notify(){
-
+	public static function wc_globepay_notify(){
 
 		$json =isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:'';
 
