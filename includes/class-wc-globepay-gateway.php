@@ -154,8 +154,14 @@ class WC_GlobePay extends WC_Payment_Gateway {
                 'description' => 'Instructions that will be added to the thank you page.',
                 'default' => '',
                 'section' => 'default'
+            ),
+            'wechat_direct' => array(
+                'title' => 'Enable Wechat',
+                'type' => 'checkbox',
+                'label' => 'Browser pulls up wechat payment',
+                'default' => 'no',
+                'section' => 'default'
             )
-
         );
     }
 
@@ -173,6 +179,20 @@ class WC_GlobePay extends WC_Payment_Gateway {
 
     public function is_wechat_client() {
         return strripos($_SERVER['HTTP_USER_AGENT'], 'micromessenger') != false;
+    }
+
+    public function is_mobile() {
+        if (isset($_SERVER['HTTP_VIA']) && stristr($_SERVER['HTTP_VIA'], "wap")) {
+            return true;
+        } elseif (isset($_SERVER['HTTP_ACCEPT']) && strpos(strtoupper($_SERVER['HTTP_ACCEPT']), "VND.WAP.WML")) {
+            return true;
+        } elseif (isset($_SERVER['HTTP_X_WAP_PROFILE']) || isset($_SERVER['HTTP_PROFILE'])) {
+            return true;
+        } elseif (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/(blackberry|configuration\/cldc|hp |hp-|htc |htc_|htc-|iemobile|kindle|midp|mmp|motorola|mobile|nokia|opera mini|opera |Googlebot-Mobile|YahooSeeker\/M1A1-R2D2|android|iphone|ipod|mobi|palm|palmos|pocket|portalmmm|ppc;|smartphone|sonyericsson|sqh|spv|symbian|treo|up.browser|up.link|vodafone|windows ce|xda |xda_)/i', $_SERVER['HTTP_USER_AGENT'])) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
@@ -220,23 +240,29 @@ class WC_GlobePay extends WC_Payment_Gateway {
                     'redirect' => $result->pay_url . (strpos($result->pay_url, '?') == false ? '?' : '&') . "directpay=true&time=$time&nonce_str=$nonce_str&sign=$sign&redirect=" . urlencode($this->get_return_url($order))
                 );
             } else {
+                $api_url = "https://pay.globepay.co/api/v1.0/gateway/partners/%s/orders/%s";
+
+                if($this->is_mobile() && 'yes' == $this->get_option('wechat_direct')) {
+                    $api_url = "https://pay.globepay.co/api/v1.0/h5_payment/partners/%s/orders/%s";
+                }
+
                 if ('1' == $this->get_option('qrcode_redirect')) {
                     return array(
                         'result' => 'success',
                         'redirect' => $order->get_checkout_payment_url(true)
                     );
-                } else {
-                    $result = GlobePay_API::generate_globepay_order($order, 'Wechat', "https://pay.globepay.co/api/v1.0/gateway/partners/%s/orders/%s");
-                    $time = time() . '000';
-
-                    $nonce_str = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-                    $valid_string = "$partner_code&$time&$nonce_str&$credential_code";
-                    $sign = strtolower(hash('sha256', $valid_string));
-                    return array(
-                        'result' => 'success',
-                        'redirect' => $result->pay_url . (strpos($result->pay_url, '?') == false ? '?' : '&') . "time=$time&nonce_str=$nonce_str&sign=$sign&redirect=" . urlencode($this->get_return_url($order))
-                    );
                 }
+
+                $result = GlobePay_API::generate_globepay_order($order, 'Wechat', $api_url);
+                $time = time() . '000';
+
+                $nonce_str = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+                $valid_string = "$partner_code&$time&$nonce_str&$credential_code";
+                $sign = strtolower(hash('sha256', $valid_string));
+                return array(
+                    'result' => 'success',
+                    'redirect' => $result->pay_url . (strpos($result->pay_url, '?') == false ? '?' : '&') . "time=$time&nonce_str=$nonce_str&sign=$sign&redirect=" . urlencode($this->get_return_url($order))
+                );
 
             }
         } catch (Exception $e) {
