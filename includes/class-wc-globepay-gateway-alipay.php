@@ -59,7 +59,7 @@ class WC_GlobePay_Alipay extends WC_Payment_Gateway{
 
 	public function get_icon() {
 
-		$icons_str = '<img src="' . GLOBEPAY_URL . '/assets/images/alipay-logo.png" class="right-float" alt="Alipay" />';
+		$icons_str = '<img src="' . GLOBEPAY_URL . '/assets/images/alipay-logo.png" class="right-float" alt="Alipay" style="height: 26px" />';
 
 		return apply_filters( 'woocommerce_gateway_icon', $icons_str, $this->id );
 	}

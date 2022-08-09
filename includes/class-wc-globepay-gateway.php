@@ -58,7 +58,7 @@ class WC_GlobePay extends WC_Payment_Gateway {
 
     public function get_icon() {
 
-        $icons_str = '<img src="' . GLOBEPAY_URL . '/assets/images/wechat-logo.png" class="right-float" alt="Wechat Pay" />';
+        $icons_str = '<img src="' . GLOBEPAY_URL . '/assets/images/wechat-logo.png" class="right-float" alt="Wechat Pay" style="height: 26px" />';
 
         return apply_filters('woocommerce_gateway_icon', $icons_str, $this->id);
     }
