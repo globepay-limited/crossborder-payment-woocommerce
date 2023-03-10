@@ -85,8 +85,9 @@ class WC_GlobePay extends WC_Payment_Gateway {
                 'label' => 'Enable GlobePay - WeChat Pay',
                 'default' => 'no',
                 'section' => 'default',
-                'description' => @sprintf(__('* To Enable Alipay <a href="%s" target="_blank">here</a>.<br /> * To Enable UnionPay Debit <a href="%s" target="_blank">here</a>.<br /> * To Enable UnionPay Credit <a href="%s" target="_blank">here</a>.', 'woocommerce-gateway-globepay'),
-                    admin_url('admin.php?page=wc-settings&tab=checkout&section=globepay_alipay')
+                'description' => sprintf( __( '* To Enable Alipay <a href="%s" target="_blank">here</a>.<br /> * To Enable UnionPay Debit <a href="%s" target="_blank">here</a>.', 'woocommerce-gateway-globepay' ),
+                    admin_url( 'admin.php?page=wc-settings&tab=checkout&section=globepay_alipay' ),
+                    admin_url( 'admin.php?page=wc-settings&tab=checkout&section=globepay_unionpay' )
                 )
             ),
             'title' => array(

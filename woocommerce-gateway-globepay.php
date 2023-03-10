@@ -28,6 +28,7 @@ function globepay_init() {
 	include_once('includes/class-wc-globepay-api.php');
 	include_once('includes/class-wc-globepay-gateway.php');
 	include_once('includes/class-wc-globepay-gateway-alipay.php');
+	include_once('includes/class-wc-globepay-gateway-unionpay.php');
 
 
 	global $GlobePay;
@@ -40,6 +41,9 @@ function globepay_init() {
 	global $GlobePayAli;
 	$GlobePayAli= new WC_GlobePay_Alipay();
 
+	global $GlobePayUnion;
+	$GlobePayUnion= new WC_GlobePay_Unionpay();
+
 
 	// Now that we have successfully included our class,
 	// Lets add it too WooCommerce
@@ -47,6 +51,7 @@ function globepay_init() {
 	function add_globepay_gateway( $methods ) {
 		$methods[] = 'WC_GlobePay';
 		$methods[] = 'WC_GlobePay_Alipay';
+		$methods[] = 'WC_GlobePay_Unionpay';
 
 		return $methods;
 	}
@@ -67,7 +72,7 @@ function globepay_init() {
 	add_action( 'woocommerce_admin_order_data_after_billing_address', 'wc_globepay_custom_display_admin', 10, 1 );
 	function wc_globepay_custom_display_admin($order){
 		$method = get_post_meta( $order->get_id(), '_payment_method', true );
-		if($method != 'globepay' && $method != 'globepay_alipay'){
+		if($method != 'globepay' && $method != 'globepay_alipay' && $method != 'globepay_unionpay'){
 			return;
 		}
 		$channel = get_post_meta( $order->get_id(), 'channel', true );
