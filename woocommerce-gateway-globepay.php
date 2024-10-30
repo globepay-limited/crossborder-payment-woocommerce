@@ -2,7 +2,7 @@
 /*
  * Plugin Name: GlobePay - WeChat Pay, Alipay & UnionPay for WooCommerce (英国微信支付，支付宝，银联支付)
  * Description: GlobePay - Accept WeChat Pay, Alipay & UnionPay in WooCommerce, 支持微信、支付宝、银联支付，快捷支付，退款，支付人民币商家收英镑
- * Version: 1.5
+ * Version: 1.6
  * Author: GlobePay
  * Author URI: https://www.globepay.co
  * Text Domain: GlobePay - WeChat Pay for WooCommerce
@@ -29,6 +29,7 @@ function globepay_init() {
 	include_once('includes/class-wc-globepay-gateway.php');
 	include_once('includes/class-wc-globepay-gateway-alipay.php');
 	include_once('includes/class-wc-globepay-gateway-unionpay.php');
+	include_once('includes/class-wc-globepay-gateway-alipayplus.php');
 
 
 	global $GlobePay;
@@ -44,6 +45,9 @@ function globepay_init() {
 	global $GlobePayUnion;
 	$GlobePayUnion= new WC_GlobePay_Unionpay();
 
+	global $GlobePayAlipayPlus;
+	$GlobePayAlipayPlus= new WC_GlobePay_Alipayplus();
+
 
 	// Now that we have successfully included our class,
 	// Lets add it too WooCommerce
@@ -52,6 +56,7 @@ function globepay_init() {
 		$methods[] = 'WC_GlobePay';
 		$methods[] = 'WC_GlobePay_Alipay';
 		$methods[] = 'WC_GlobePay_Unionpay';
+		$methods[] = 'WC_GlobePay_Alipayplus';
 
 		return $methods;
 	}
