@@ -204,13 +204,13 @@ class WC_GlobePay_Alipay extends WC_Payment_Gateway{
 
 		try {
 			if($this->is_app_client()){
-				$result = GlobePay_API::generate_globepay_order($order,'Alipay',"https://pay.globepay.co/api/v1.0/h5_payment/partners/%s/orders/%s");
+				$result = GlobePay_API::generate_globepay_order($order,'AlipayOnline',"https://pay.globepay.co/api/v1.0/h5_payment/partners/%s/orders/%s");
 			}else{
 				if('1'==$this->get_option('qrcode_redirect')){
-					$result = GlobePay_API::generate_globepay_order($order,'Alipay',"https://pay.globepay.co/api/v1.0/web_gateway/partners/%s/orders/%s");
+					$result = GlobePay_API::generate_globepay_order($order,'AlipayOnline',"https://pay.globepay.co/api/v1.0/web_gateway/partners/%s/orders/%s");
 
 				}else{
-					$result = GlobePay_API::generate_globepay_order($order,'Alipay',"https://pay.globepay.co/api/v1.0/gateway/partners/%s/orders/%s");
+					$result = GlobePay_API::generate_globepay_order($order,'AlipayOnline',"https://pay.globepay.co/api/v1.0/gateway/partners/%s/orders/%s");
 				}
 			}
 
