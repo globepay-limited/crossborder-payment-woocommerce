@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 // Setup our Gateway's id, description and other values
+#[AllowDynamicProperties]
 class WC_GlobePay_Alipayplus extends WC_Payment_Gateway{
 
 

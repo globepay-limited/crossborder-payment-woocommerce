@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 // Setup our Gateway's id, description and other values
+#[AllowDynamicProperties]
 class WC_GlobePay_Unionpay extends WC_Payment_Gateway{
 
 

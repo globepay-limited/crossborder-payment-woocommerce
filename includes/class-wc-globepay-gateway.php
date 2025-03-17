@@ -5,6 +5,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Setup our Gateway's id, description and other values
+#[AllowDynamicProperties]
 class WC_GlobePay extends WC_Payment_Gateway {
 
 

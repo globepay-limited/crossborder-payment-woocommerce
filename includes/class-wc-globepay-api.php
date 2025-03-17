@@ -240,17 +240,6 @@ class GlobePay_API{
         $data =new stdClass();
         $data->fee = $amount;
         $data=json_encode($data);
-        $args = array(
-            'body'        => $data,
-            'timeout'     => '5',
-            'redirection' => '5',
-            'httpversion' => '1.0',
-            'blocking'    => true,
-            'cookies'     => array(),
-            'headers' => array(
-                'Authorization' => 'Basic ' . base64_encode( YOUR_USERNAME . ':' . YOUR_PASSWORD )
-            )
-        );
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $url);
